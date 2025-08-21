@@ -1,0 +1,350 @@
+
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Terreno - Varas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+
+        #logo {
+            position: fixed;
+            top: 200px;
+            left: 20px;
+            width: 150px; /* ajuste aqui */
+            height: auto;
+            z-index: 10;
+        }
+    
+        
+        .container {
+            backdrop-filter: blur(10px);
+            background: rgba(10, 177, 41, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(19, 214, 84, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .input-field {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #2139c3;
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .calculate-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            padding: 14px 32px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            transform: translateY(0);
+        }
+        
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+        
+        .result-box {
+            background: linear-gradient(135deg, #1010a5 0%, #310b90 100%);
+            border-radius: 12px;
+            padding: 20px;
+            color: white;
+            text-align: center;
+            font-weight: 600;
+            font-size: 18px;
+            box-shadow: 0 10px 25px rgba(34, 197, 94, 0.2);
+        }
+        
+        .step-indicator {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+        
+        .terrain-visual {
+            background: #f8fafc;
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .terrain-side {
+            position: absolute;
+            font-weight: 600;
+            color: #475569;
+            font-size: 14px;
+        }
+        
+        .terrain-side.top { top: -5px; left: 50%; transform: translateX(-50%); }
+        .terrain-side.bottom { bottom: -5px; left: 50%; transform: translateX(-50%); }
+        .terrain-side.left { left: -5px; top: 50%; transform: translateY(-50%) rotate(-90deg); }
+        .terrain-side.right { right: -5px; top: 50%; transform: translateY(-50%) rotate(90deg); }
+        
+        .calculation-steps {
+            background: #f1f5f9;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 20px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .icon {
+            width: 24px;
+            height: 24px;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        h3 {
+            font-size: large;
+            font-weight: bold;
+            color: #10b04b;
+            padding: 0% 0 10px;
+            border-radius: 0cqmax(0, 0, 0, 0);
+            margin-top: auto;
+            font-size: 50px;
+            font-weight: bold;
+            color: #10b04b;
+            padding: 0% 0 1px;
+        }
+     
+    </style>
+</head>
+<body class="p-4">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="logo">
+             <img src="pf1.png" alt="Logo RB Tecnologia"
+     style="position: fixed; top: 55px; left: 600px; width: 130px; height: auto; z-index: 10; flex-direction: column;">
+                </div>
+    <div class="max-w-4xl mx-auto">
+                
+                <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+                </svg>
+                Calculadora de Terreno
+            </h1>
+
+            <p class="text-white text-lg opacity-90">Calcule a área do seu terreno em varas</p>
+            
+        </div>
+
+        <div class="container p-8 mx-auto">
+            <!-- Visualização do Terreno -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Dimensões do Terreno</h2>
+                
+                <div class="terrain-visual">
+                    <div class="terrain-side top">Frente: <span id="frente-display">0</span> varas</div>
+                    <div class="terrain-side bottom">Fundo: <span id="fundo-display">0</span> varas</div>
+                    <div class="terrain-side left">Esquerdo: <span id="esquerdo-display">0</span> varas</div>
+                    <div class="terrain-side right">Direito: <span id="direito-display">0</span> varas</div>
+                    <div class="text-center text-gray-500 mt-8">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/52ab34dc-bf25-4fa0-9c63-f7dc5ac7d53d.png" alt="Vista aérea de um terreno retangular com medidas marcadas em cada lado, mostrando frente, fundo e laterais delimitadas" class="mx-auto rounded-lg" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulário de Entrada -->
+            <div class="grid md:grid-cols-2 gap-6 mb-8">
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">
+                        <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"/>
+                        </svg>
+                        Frente (varas)
+                    </label>
+                    <input type="number" id="frente" class="input-field" placeholder="Ex: 20" min="0" step="0.01">
+                </div>
+                
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">
+                        <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"/>
+                        </svg>
+                        Fundo (varas)
+                    </label>
+                    <input type="number" id="fundo" class="input-field" placeholder="Ex: 20" min="0" step="0.01">
+                </div>
+                
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">
+                        <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"/>
+                        </svg>
+                        Lado Esquerdo (varas)
+                    </label>
+                    <input type="number" id="esquerdo" class="input-field" placeholder="Ex: 30" min="0" step="0.01">
+                </div>
+                
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">
+                        <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"/>
+                        </svg>
+                        Lado Direito (varas)
+                    </label>
+                    <input type="number" id="direito" class="input-field" placeholder="Ex: 30" min="0" step="0.01">
+                </div>
+            </div>
+
+            <!-- Botão de Cálculo -->
+            <div class="text-center mb-8">
+                <button onclick="calcular()" class="calculate-btn">
+                    <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm1 2a1 1 0 000 2h6a1 1 0 100-2H7zm6 7a1 1 0 011 1v3a1 1 0 11-2 0v-3a1 1 0 011-1zm-3 3a1 1 0 100 2h.01a1 1 0 100-2H10zm-4 1a1 1 0 011-1h.01a1 1 0 110 2H7a1 1 0 01-1-1zm1-4a1 1 0 100 2h.01a1 1 0 100-2H7zm2 0a1 1 0 100 2h.01a1 1 0 100-2H9zm2 0a1 1 0 100 2h.01a1 1 0 100-2H11zm0-2a1 1 0 100 2h.01a1 1 0 100-2H11zm-2 0a1 1 0 100 2h.01a1 1 0 100-2H9zm-2 0a1 1 0 100 2h.01a1 1 0 100-2H7zm2-2a1 1 0 100 2h.01a1 1 0 100-2H9zm2 0a1 1 0 100 2h.01a1 1 0 100-2H11zm0-2a1 1 0 100 2h.01a1 1 0 100-2H11zm-2 0a1 1 0 100 2h.01a1 1 0 100-2H9zm-2 0a1 1 0 100 2h.01a1 1 0 100-2H7z"/>
+                    </svg>
+                    Calcular Área
+                </button>
+            </div>
+
+            <!-- Resultado -->
+            <div id="resultado" style="display: none;" class="result-box">
+                <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                </svg>
+                <div id="resultado-texto"></div>
+            </div>
+
+            <!-- Passos do Cálculo -->
+            <div id="passos" style="display: none;" class="calculation-steps">
+                <h3 class="text-lg font-bold text-gray-800 mb-3">
+                    <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z"/>
+                    </svg>
+                    Como foi calculado:
+                </h3>
+                <div id="passos-calculo"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Atualiza a visualização do terreno em tempo real
+        function atualizarVisualizacao() {
+            document.getElementById('frente-display').textContent = document.getElementById('frente').value || '0';
+            document.getElementById('fundo-display').textContent = document.getElementById('fundo').value || '0';
+            document.getElementById('esquerdo-display').textContent = document.getElementById('esquerdo').value || '0';
+            document.getElementById('direito-display').textContent = document.getElementById('direito').value || '0';
+        }
+
+        // Inicializa os event listeners quando a página carregar
+        document.addEventListener('DOMContentLoaded', function() {
+            // Adiciona event listeners para atualização em tempo real
+            document.getElementById('frente').addEventListener('input', atualizarVisualizacao);
+            document.getElementById('fundo').addEventListener('input', atualizarVisualizacao);
+            document.getElementById('esquerdo').addEventListener('input', atualizarVisualizacao);
+            document.getElementById('direito').addEventListener('input', atualizarVisualizacao);
+        });
+
+        function calcular() {
+            console.log('Função calcular() foi chamada'); // Debug
+            
+            // Pega os valores dos inputs
+            const frente = parseFloat(document.getElementById('frente').value) || 0;
+            const fundo = parseFloat(document.getElementById('fundo').value) || 0;
+            const esquerdo = parseFloat(document.getElementById('esquerdo').value) || 0;
+            const direito = parseFloat(document.getElementById('direito').value) || 0;
+
+            console.log('Valores:', { frente, fundo, esquerdo, direito }); // Debug
+
+            // Validação
+            if (frente <= 0 || fundo <= 0 || esquerdo <= 0 || direito <= 0) {
+                alert('Por favor, preencha todos os campos com valores maiores que zero.');
+                return;
+            }
+
+            // Cálculos conforme especificado
+            const somaFrenteFundo = frente + fundo;
+            const somaLados = esquerdo + direito;
+            const area = somaFrenteFundo * somaLados;
+
+            // Elimina os dois últimos dígitos
+            const areaStr = Math.floor(area).toString();
+            const areaSemDoisDigitos = areaStr.length > 2 ? parseInt(areaStr.slice(0, -2)) : 0;
+
+            // Divide por 25
+            const resultadoFinal = areaSemDoisDigitos / 25;
+
+            console.log('Resultado final:', resultadoFinal); // Debug
+
+            // Exibe o resultado
+            document.getElementById('resultado-texto').innerHTML = 
+                '<div class="text-2xl font-bold mb-2">Resultado Final: ' + resultadoFinal.toFixed(2) + '</div>' +
+                '<div class="text-sm opacity-90">Área calculada do terreno</div>';
+
+            // Exibe os passos do cálculo
+            document.getElementById('passos-calculo').innerHTML = 
+                '<div style="margin-bottom: 12px;">' +
+                    '<div class="step-indicator">Passo 1</div>' +
+                    '<div><strong>Soma Frente + Fundo:</strong> ' + frente + ' + ' + fundo + ' = ' + somaFrenteFundo + ' varas</div>' +
+                '</div>' +
+                '<div style="margin-bottom: 12px;">' +
+                    '<div class="step-indicator">Passo 2</div>' +
+                    '<div><strong>Soma Esquerdo + Direito:</strong> ' + esquerdo + ' + ' + direito + ' = ' + somaLados + ' varas</div>' +
+                '</div>' +
+                '<div style="margin-bottom: 12px;">' +
+                    '<div class="step-indicator">Passo 3</div>' +
+                    '<div><strong>Multiplicação:</strong> ' + somaFrenteFundo + ' × ' + somaLados + ' = ' + area + '</div>' +
+                '</div>' +
+                '<div style="margin-bottom: 12px;">' +
+                    '<div class="step-indicator">Passo 4</div>' +
+                    '<div><strong>Eliminar 2 últimos dígitos:</strong> ' + Math.floor(area) + ' → ' + areaSemDoisDigitos + '</div>' +
+                '</div>' +
+                '<div style="margin-bottom: 12px;">' +
+                    '<div class="step-indicator">Passo 5</div>' +
+                    '<div><strong>Dividir por 25:</strong> ' + areaSemDoisDigitos + ' ÷ 25 = ' + resultadoFinal.toFixed(2) + '</div>' +
+                '</div>';
+
+            // Mostra os elementos de resultado
+            document.getElementById('resultado').style.display = 'block';
+            document.getElementById('passos').style.display = 'block';
+
+            console.log('Resultado mostrado'); // Debug
+
+            // Scroll suave para o resultado
+            setTimeout(function() {
+                document.getElementById('resultado').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        }
+
+        // Permite calcular pressionando Enter
+        document.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                calcular();
+            }
+        });
+    </script>
+</body>
+</html>
+
+```
